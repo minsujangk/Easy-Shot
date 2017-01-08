@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Easy Shot</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="INTENT_SCREENSHOT" translatable="false">doortodoor.easyshot.intent.screenshot</string>
+</resources>
