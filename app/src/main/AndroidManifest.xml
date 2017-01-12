@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="doortodoor.easyshot">
 
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -11,7 +10,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
@@ -23,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".under5.OnCapturedActivity"
+            android:name=".under_lollipop.OnCapturedActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.Translucent">
             <intent-filter>
@@ -36,10 +34,10 @@
                 android:name="com.android.systemui.action_assist_icon"
                 android:resource="@mipmap/ic_launcher" />
         </activity>
-        <activity android:name=".over5.MediaProjectionService$AcquireMediaProjectionPermissionIntent" />
+        <activity android:name=".over_lollipop.MediaProjectionService$AcquireMediaProjectionPermissionIntent" />
 
         <service
-            android:name=".over5.AssistService"
+            android:name=".over_lollipop.assistant.AssistService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_VOICE_INTERACTION">
@@ -52,15 +50,21 @@
             </intent-filter>
         </service>
         <service
-            android:name=".over5.AssistSessionService"
+            android:name=".over_lollipop.assistant.AssistSessionService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="android.permission.BIND_VOICE_INTERACTION" />
         <service
-            android:name=".over5.mediaprojection.ScreenshotService"
+            android:name=".over_lollipop.mediaprojection.ScreenshotService"
             android:enabled="true"
             android:exported="true" />
 
-        <receiver android:name=".over5.mediaprojection.ScreenshotService$ScreenshotServiceReceiver" />
+        <receiver android:name=".over_lollipop.mediaprojection.ScreenshotService$ScreenshotServiceReceiver" />
+
+        <service
+            android:name=".MyAccessibilityService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

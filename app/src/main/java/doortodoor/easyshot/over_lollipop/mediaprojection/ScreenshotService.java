@@ -1,4 +1,4 @@
-package doortodoor.easyshot.over5.mediaprojection;
+package doortodoor.easyshot.over_lollipop.mediaprojection;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

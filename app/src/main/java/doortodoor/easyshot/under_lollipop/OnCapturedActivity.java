@@ -1,4 +1,4 @@
-package doortodoor.easyshot.under5;
+package doortodoor.easyshot.under_lollipop;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

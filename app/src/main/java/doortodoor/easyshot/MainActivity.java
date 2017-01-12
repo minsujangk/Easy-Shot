@@ -22,7 +22,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import doortodoor.easyshot.over5.mediaprojection.ScreenshotService;
+import doortodoor.easyshot.over_lollipop.mediaprojection.ScreenshotService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     startScreenshotService();
                     //           resolveScreenshot(mMediaProjectionService.captureScreen());
                 }
@@ -62,6 +62,51 @@ public class MainActivity extends AppCompatActivity {
                 sendBroadcast(intent);
             }
         });
+
+//        try{
+//
+//            Cursor mCur = null;
+//            try{
+//                String sortOrder = Browser.BookmarkColumns.TITLE + " ASC";
+//                final Uri BOOKMARKS_URI = Uri.parse("content://browser/bookmarks");
+//                final String[] HISTORY_PROJECTION = new String[]{
+//                        "_id", // 0
+//                        "url", // 1
+//                        "visits", // 2
+//                        "date", // 3
+//                        "bookmark", // 4
+//                        "title", // 5
+//                        "favicon", // 6
+//                        "thumbnail", // 7
+//                        "touch_icon", // 8
+//                        "user_entered", // 9
+//                };
+//                 final int HISTORY_PROJECTION_TITLE_INDEX = 5;
+//                final int HISTORY_PROJECTION_URL_INDEX = 1;
+//
+//                mCur = getContentResolver().query(BOOKMARKS_URI,)
+//
+//                mCur.moveToFirst();
+//                if (mCur.moveToFirst() && mCur.getCount() > 0) {
+//                    while (mCur.isAfterLast() == false) {
+//                        String title = mCur.getString(Browser.HISTORY_PROJECTION_TITLE_INDEX);
+//                        String url = mCur.getString(Browser.HISTORY_PROJECTION_URL_INDEX);
+//                        long date = mCur.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX);
+//                        mCur.moveToNext();
+//                    }
+//                }else{
+//                    mCur.close();
+//                }
+//
+//            }catch(Exception e){
+//
+//            }finally{
+//                mCur.close();
+//            }
+//
+//        }catch(Exception e){
+//
+//        }
 
 
 //        String assistant =

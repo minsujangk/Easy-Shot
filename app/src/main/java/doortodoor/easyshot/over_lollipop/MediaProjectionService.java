@@ -1,4 +1,4 @@
-package doortodoor.easyshot.over5;
+package doortodoor.easyshot.over_lollipop;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
