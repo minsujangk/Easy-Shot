@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,15 +14,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
+import doortodoor.easyshot.database.DataItem;
+import doortodoor.easyshot.database.ImageDatabaseManager;
 import doortodoor.easyshot.over_lollipop.mediaprojection.ScreenshotService;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        RelativeLayout tev = (RelativeLayout) findViewById(R.id.include);
+        LinearLayout layout = (LinearLayout) tev.findViewById(R.id.container);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -62,6 +75,35 @@ public class MainActivity extends AppCompatActivity {
                 sendBroadcast(intent);
             }
         });
+
+        ImageDatabaseManager mManager = new ImageDatabaseManager(this);
+        ArrayList<DataItem> items = mManager.getAll();
+
+        for (DataItem item : items) {
+            LinearLayout linear = new LinearLayout(this);
+            linear.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            linear.setOrientation(LinearLayout.VERTICAL);
+            File imgFile = new File(item.getLocation());
+            ImageView imageView = new ImageView(this);
+            if (imgFile.exists()) {
+                Bitmap myBitmap = null;
+                if (imgFile != null) {
+                    myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                }
+                imageView.setImageBitmap(myBitmap);
+            }
+            TextView t = new TextView(this);
+            t.setText(item.getColumnUrl());
+
+            linear.addView(imageView);
+            linear.addView(t);
+
+            layout.addView(linear);
+
+
+        }
+
 
 //        try{
 //

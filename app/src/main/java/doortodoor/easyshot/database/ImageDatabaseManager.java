@@ -66,6 +66,18 @@ public class ImageDatabaseManager {
         return newRowId != -1;
     }
 
+
+    /*
+    * 데이터베이스에서 entry가 value와 일치하는 row를 찾아서 ArrayList<DataItem>으로 반환한다.
+    *
+    * Input
+    *   entry   : 찾을 DataItem의 타입
+    *   value   : 값의 ArrayList
+    *
+    * Output
+    *   ArrayList<DataItem> : 찾은 DataItem들의 List
+    *   */
+
     public ArrayList<DataItem> search(String entry, ArrayList<String> value) {
         String[] projection = {
                 TableEntry.COLUMN_IMAGE_LOCATION,
@@ -84,35 +96,49 @@ public class ImageDatabaseManager {
                 , null, null, null);
 
         c.moveToFirst();
-        while (c.isAfterLast()) {
+        while (c.isAfterLast() == false) {
             //ArrayList of tag 얻기
             ArrayList<String> tags = new ArrayList<String>();
             String tagString = c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_TAG));
             tags = parseTagString(tagString);
 
-            DataItem DataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(TableEntry._ID)),
+            DataItem dataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(TableEntry._ID)),
                     c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_IMAGE_LOCATION)),
                     c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_NAME)),
                     Integer.parseInt(c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_PRICE))),
                     tags,
                     c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_URL)));
 
-            list.add(DataItem);
+            list.add(dataItem);
+            c.moveToNext();
         }
 
         return list;
     }
 
-    /*
-    * 데이터베이스에서 entry가 value와 일치하는 row를 찾아서 ArrayList<DataItem>으로 반환한다.
-    *
-    * Input
-    *   entry   : 찾을 DataItem의 타입
-    *   value   : 값의 ArrayList
-    *
-    * Output
-    *   ArrayList<DataItem> : 찾은 DataItem들의 List
-    *   */
+    public ArrayList<DataItem> getAll() {
+        ArrayList<DataItem> list = new ArrayList<DataItem>();
+        Cursor c = mDatabase.rawQuery("select * from " + TableEntry.TABLE_NAME, null);
+        if (c.moveToFirst()) {
+            while (c.isAfterLast() == false) {
+                ArrayList<String> tags = new ArrayList<String>();
+                String tagString = c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_TAG));
+                tags = parseTagString(tagString);
+                DataItem dataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(TableEntry._ID)),
+                        c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_IMAGE_LOCATION)),
+                        c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_NAME)),
+                        Integer.parseInt(c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_PRICE))),
+                        tags,
+                        c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_URL)));
+
+                list.add(dataItem);
+                c.moveToNext();
+            }
+        }
+
+        return list;
+    }
+
 
     public ArrayList<String> parseTagString(String tagString) {
         //[,] 제거

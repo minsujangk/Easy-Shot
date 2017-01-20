@@ -22,11 +22,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
 import doortodoor.easyshot.R;
+import doortodoor.easyshot.database.ImageDatabaseManager;
 
 /**
  * Created by noble on 2017-01-05.
@@ -36,6 +38,7 @@ import doortodoor.easyshot.R;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class AssistSession extends VoiceInteractionSession {
 
+    private final ImageDatabaseManager mManager;
     private Bitmap mScreenshot;
     private Context mContext;
     private TextView textView;
@@ -44,10 +47,12 @@ public class AssistSession extends VoiceInteractionSession {
     private TextView textView4;
     private TextView textView5;
     private TextView textView6;
+    private String mURL;
 
     public AssistSession(Context context) {
         super(context);
         mContext = context;
+        mManager = new ImageDatabaseManager(mContext);
     }
 
 
@@ -78,6 +83,8 @@ public class AssistSession extends VoiceInteractionSession {
             textView.setText("No");
         }
 
+        mURL = "";
+
         textView5.setText(content.getIntent().toString());
         textView2.setText(content.getIntent().getDataString());
         StringBuilder str = new StringBuilder();
@@ -89,8 +96,12 @@ public class AssistSession extends VoiceInteractionSession {
                 String key = it.next();
                 str.append(key);
                 str.append(":");
-                str.append(bundle.get(key));
+                str.append(bundle.getString(key));
                 str.append("\n\r");
+                if (key != null && key.contains("ITEMNO"))
+                    mURL = "http://itempage3.auction.co.kr/detailview.aspx?itemNo=" + bundle.getString(key);
+                if (bundle.getString(key) != null && bundle.getString(key).contains("http"))
+                    mURL = bundle.getString(key);
             }
             textView6.setText(str.toString());
         }
@@ -98,11 +109,12 @@ public class AssistSession extends VoiceInteractionSession {
         textView3.setText(structure.getActivityComponent().toString());
 //        ActivityManager mActivityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
 //        String mPackageName = mActivityManager.getRunningAppProcesses().get(0).
-        for (int i = 0; i < structure.getWindowNodeCount(); i++) {
-            if (structure.getWindowNodeAt(i).getRootViewNode().getExtras() != null) {
-                textView4.setText(structure.getWindowNodeAt(i).getRootViewNode().getExtras().toString());
-            }
-        }
+//        for (int i = 0; i < structure.getWindowNodeCount(); i++) {
+//            if (structure.getWindowNodeAt(i).getRootViewNode().getExtras() != null) {
+//                textView4.setText(structure.getWindowNodeAt(i).getRootViewNode().getExtras().toString());
+//            }
+//        }
+        textView4.setText(mURL);
 //        textView4.setText(structure.getWindowNodeCount());
 
         //View view = structure.getWindowNodeAt(0);
@@ -113,11 +125,12 @@ public class AssistSession extends VoiceInteractionSession {
     public void onHandleScreenshot(Bitmap screenshot) {
         if (screenshot != null) {
             mScreenshot = screenshot;
-            resolveScreenshot(screenshot);
+            String filePath = resolveScreenshot(screenshot);
+            mManager.insert("hh", 1, filePath, new ArrayList<String>(), mURL);
         }
     }
 
-    private void resolveScreenshot(Bitmap captured) {
+    private String resolveScreenshot(Bitmap captured) {
         String IMAGES_PRODUCED = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String exStorage = Environment.getExternalStorageDirectory().toString();
 
@@ -147,5 +160,6 @@ public class AssistSession extends VoiceInteractionSession {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return file.toString();
     }
 }
