@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,22 +20,26 @@ public class ImageDatabaseManager {
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
     private static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + TableEntry.TABLE_NAME + " (" +
-                    TableEntry._ID + " INTEGER PRIMARY KEY," +
-                    TableEntry.COLUMN_IMAGE_LOCATION + TEXT_TYPE + COMMA_SEP +
-                    TableEntry.COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
-                    TableEntry.COLUMN_PRICE + TEXT_TYPE + COMMA_SEP +
-                    TableEntry.COLUMN_TAG + TEXT_TYPE + COMMA_SEP +
-                    TableEntry.COLUMN_URL + TEXT_TYPE + " )";
+            "CREATE TABLE " + ImageTableEntry.TABLE_NAME + " (" +
+                    ImageTableEntry._ID + " INTEGER PRIMARY KEY," +
+                    ImageTableEntry.COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
+                    ImageTableEntry.COLUMN_FOLDER_ID + TEXT_TYPE + COMMA_SEP +
+                    ImageTableEntry.COLUMN_IMAGE_LOCATION + TEXT_TYPE + COMMA_SEP +
+                    ImageTableEntry.COLUMN_TAG + TEXT_TYPE + COMMA_SEP +
+                    ImageTableEntry.COLUMN_URL + TEXT_TYPE + " )";
     private static final String SQL_DELETE_ENTRIES =
-            "DROP TABLE IF EXISTS " + TableEntry.TABLE_NAME;
+            "DROP TABLE IF EXISTS " + ImageTableEntry.TABLE_NAME;
     public static Context mContext;
     private final SQLiteDatabase mDatabase;
     private final ImageDatabaseHelper mHelper;
+    private final FolderDatabaseManager mFolder;
+    private ArrayList<Folder> mFolder_list;
 
     public ImageDatabaseManager(Context context) {
         mContext = context;
         mHelper = new ImageDatabaseHelper(context);
+        mFolder = new FolderDatabaseManager(context);
+        mFolder_list = mFolder.getAll();
         mDatabase = mHelper.getWritableDatabase();
     }
 
@@ -42,25 +47,37 @@ public class ImageDatabaseManager {
     * 데이터베이스에 주어진 값으로 이루어진 Row를 삽입한다.
     *
     * Input
-    *   img_loc : 이미지의 경로
     *   name    : 상품의 이름
+    *   folder_name : 상품이 저장될 폴더의 이름
     *   price   : 상품의 가격
+    *   img_loc : 이미지의 경로
     *   tag     : 상품의 태그 (비어있을 수 있다.)
     *   url     : 상품의 URL (null일 수 있다.)
     *
     * Output
     *   boolean type : 성공하면 true, 실패하면
     *   */
-    public boolean insert(String name, int price, String img_loc, ArrayList<String> tag, String url) {
+    public boolean insert(String name, String folder_name, String img_loc, ArrayList<String> tag, String url) {
+        long folder_id = -1;
+        for (Folder folder : mFolder_list) {
+            if (folder.getFolderName().equals(folder_name)) {
+                folder_id = folder.getId();
+                break;
+            }
+        }
+        if (folder_id == -1) { // 폴더가 발견되지 않음. 새로 만듦.
+            folder_id = mFolder.insert(folder_name);
+        }
+
         ContentValues values = new ContentValues();
-        values.put(TableEntry.COLUMN_NAME, name);
-        values.put(TableEntry.COLUMN_PRICE, price);
-        values.put(TableEntry.COLUMN_IMAGE_LOCATION, img_loc);
-        values.put(TableEntry.COLUMN_TAG, tag.toString());
-        values.put(TableEntry.COLUMN_URL, url);
+        values.put(ImageTableEntry.COLUMN_NAME, name);
+        values.put(ImageTableEntry.COLUMN_FOLDER_ID, folder_id);
+        values.put(ImageTableEntry.COLUMN_IMAGE_LOCATION, img_loc);
+        values.put(ImageTableEntry.COLUMN_TAG, tag.toString());
+        values.put(ImageTableEntry.COLUMN_URL, url);
 
         //데이터베이스에 삽입
-        long newRowId = mDatabase.insert(TableEntry.TABLE_NAME, null, values);
+        long newRowId = mDatabase.insert(ImageTableEntry.TABLE_NAME, null, values);
 
         //insert가 실패하면
         return newRowId != -1;
@@ -80,11 +97,11 @@ public class ImageDatabaseManager {
 
     public ArrayList<DataItem> search(String entry, ArrayList<String> value) {
         String[] projection = {
-                TableEntry.COLUMN_IMAGE_LOCATION,
-                TableEntry.COLUMN_NAME,
-                TableEntry.COLUMN_PRICE,
-                TableEntry.COLUMN_TAG,
-                TableEntry.COLUMN_URL
+                ImageTableEntry.COLUMN_NAME,
+                ImageTableEntry.COLUMN_FOLDER_ID,
+                ImageTableEntry.COLUMN_IMAGE_LOCATION,
+                ImageTableEntry.COLUMN_TAG,
+                ImageTableEntry.COLUMN_URL
         };
         String selection = entry + "= ?";
         String[] selectionArgs = (String[]) value.toArray();
@@ -92,22 +109,22 @@ public class ImageDatabaseManager {
         ArrayList<DataItem> list = new ArrayList<DataItem>();
 
 
-        Cursor c = mDatabase.query(TableEntry.TABLE_NAME, projection, selection, selectionArgs
+        Cursor c = mDatabase.query(ImageTableEntry.TABLE_NAME, projection, selection, selectionArgs
                 , null, null, null);
 
         c.moveToFirst();
         while (c.isAfterLast() == false) {
             //ArrayList of tag 얻기
             ArrayList<String> tags = new ArrayList<String>();
-            String tagString = c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_TAG));
+            String tagString = c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_TAG));
             tags = parseTagString(tagString);
 
-            DataItem dataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(TableEntry._ID)),
-                    c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_IMAGE_LOCATION)),
-                    c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_NAME)),
-                    Integer.parseInt(c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_PRICE))),
+            DataItem dataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(ImageTableEntry._ID)),
+                    c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_NAME)),
+                    Integer.parseInt(c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_FOLDER_ID))),
+                    c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_IMAGE_LOCATION)),
                     tags,
-                    c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_URL)));
+                    c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_URL)));
 
             list.add(dataItem);
             c.moveToNext();
@@ -118,18 +135,18 @@ public class ImageDatabaseManager {
 
     public ArrayList<DataItem> getAll() {
         ArrayList<DataItem> list = new ArrayList<DataItem>();
-        Cursor c = mDatabase.rawQuery("select * from " + TableEntry.TABLE_NAME, null);
+        Cursor c = mDatabase.rawQuery("select * from " + ImageTableEntry.TABLE_NAME, null);
         if (c.moveToFirst()) {
             while (c.isAfterLast() == false) {
                 ArrayList<String> tags = new ArrayList<String>();
-                String tagString = c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_TAG));
+                String tagString = c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_TAG));
                 tags = parseTagString(tagString);
-                DataItem dataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(TableEntry._ID)),
-                        c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_IMAGE_LOCATION)),
-                        c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_NAME)),
-                        Integer.parseInt(c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_PRICE))),
+                DataItem dataItem = new DataItem(c.getInt(c.getColumnIndexOrThrow(ImageTableEntry._ID)),
+                        c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_NAME)),
+                        Integer.parseInt(c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_FOLDER_ID))),
+                        c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_IMAGE_LOCATION)),
                         tags,
-                        c.getString(c.getColumnIndexOrThrow(TableEntry.COLUMN_URL)));
+                        c.getString(c.getColumnIndexOrThrow(ImageTableEntry.COLUMN_URL)));
 
                 list.add(dataItem);
                 c.moveToNext();
@@ -147,10 +164,10 @@ public class ImageDatabaseManager {
     }
 
     //데이터베이스를 만들기 위한 기본적인 Columns
-    public static class TableEntry implements BaseColumns {
+    public static class ImageTableEntry implements BaseColumns {
         public static final String TABLE_NAME = "image_db";
         public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_PRICE = "price";
+        public static final String COLUMN_FOLDER_ID = "folder_id";
         public static final String COLUMN_IMAGE_LOCATION = "image_location";
         public static final String COLUMN_TAG = "tag";
         public static final String COLUMN_URL = "url";
@@ -158,15 +175,17 @@ public class ImageDatabaseManager {
 
     //SQL 작업을 위한 SQLiteOpenHelper
     public class ImageDatabaseHelper extends SQLiteOpenHelper {
-        public static final int DATABASE_VERSION = 1;
+        public static final int DATABASE_VERSION = 2;
         public static final String DATABASE_NAME = "ImageDatabase.db";
 
         public ImageDatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+            Log.e("this", "database image addeddd");
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            Log.e("this", "database image added");
             db.execSQL(SQL_CREATE_ENTRIES);
         }
 

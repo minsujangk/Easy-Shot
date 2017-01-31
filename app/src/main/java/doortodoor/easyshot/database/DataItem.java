@@ -7,27 +7,28 @@ import java.util.ArrayList;
  */
 
 public class DataItem {
-    public int id;
+    public long id;
     public String location;
     public String columnName;
-    public int columnPrice;
+
+    public int columnFolder;
     public ArrayList<String> columnTag;
     public String columnUrl;
 
-    public DataItem(int id, String location, String columnName, int columnPrice, ArrayList<String> columnTag, String columnUrl) {
+    public DataItem(long id, String columnName, int columnFolder, String location, ArrayList<String> columnTag, String columnUrl) {
         this.id = id;
         this.location = location;
         this.columnName = columnName;
-        this.columnPrice = columnPrice;
+        this.columnFolder = columnFolder;
         this.columnTag = columnTag;
         this.columnUrl = columnUrl;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -47,12 +48,13 @@ public class DataItem {
         this.columnName = columnName;
     }
 
-    public int getColumnPrice() {
-        return columnPrice;
+
+    public int getColumnFolder() {
+        return columnFolder;
     }
 
-    public void setColumnPrice(int columnPrice) {
-        this.columnPrice = columnPrice;
+    public void setColumnFolder(int columnFolder) {
+        this.columnFolder = columnFolder;
     }
 
     public ArrayList<String> getColumnTag() {

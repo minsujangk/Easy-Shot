@@ -30,8 +30,8 @@ public class MyAccessibilityService extends AccessibilityService {
         while (!queue.isEmpty()) {
             AccessibilityNodeInfo an = queue.poll();
             if (an != null) {
-                if (an.getContentDescription() != null)
-                    Log.e(TAG, "Catch Event getChildCount : " + an.getContentDescription());
+                //if (an.getContentDescription() != null)
+                Log.e(TAG, "Catch Event getChildCount : " + an.getClassName());
                 for (int i = 0; i < an.getChildCount(); i++) {
                     queue.add(an.getChild(i));
                 }
