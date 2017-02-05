@@ -19,6 +19,7 @@ import android.view.animation.Transformation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -27,9 +28,9 @@ import doortodoor.easyshot.database.ImageDatabaseManager;
 
 public class OnCapturedActivity extends AppCompatActivity implements View.OnTouchListener {
 
+    private static String INTENT_CAPTURE_URL;
     private int _xDelta;
     private int _yDelta;
-
     private RelativeLayout layout;
     private Handler handler;
     private Runnable runnable_FinishActivity;
@@ -59,6 +60,10 @@ public class OnCapturedActivity extends AppCompatActivity implements View.OnTouc
         mItemName = intent.getStringExtra("name");
         mItemLocation = intent.getStringExtra("img_loc");
         mItemURL = intent.getStringExtra("url");
+
+
+        mItemURL = getSharedPreferences("url", MODE_PRIVATE).getString("accessibility_url", "");
+        Toast.makeText(this, mItemURL, Toast.LENGTH_SHORT).show();
 
 
         mImageDatabaseManager = new ImageDatabaseManager(this);

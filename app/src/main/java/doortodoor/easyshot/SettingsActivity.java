@@ -205,7 +205,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         String curServiceComponent = Settings.Secure.getString(getActivity().getContentResolver(),
                                 "assistant");
                         String serviceComponent = "doortodoor.easyshot" + "/" + ".over_lollipop.assistant.AssistService";
-                        if (!curServiceComponent.equals(serviceComponent)) {
+                        if (!serviceComponent.equals(curServiceComponent)) {
                             Toast.makeText(getActivity(), "wrong", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent();
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

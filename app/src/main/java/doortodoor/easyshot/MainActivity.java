@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setImageBitmap(myBitmap);
             }
             TextView t = new TextView(this);
-            t.setText(Integer.toString(item.getColumnFolder()));
+            t.setText(Integer.toString(item.getColumnFolder()) + " " + item.getColumnUrl());
 
             linear.addView(imageView);
             linear.addView(t);

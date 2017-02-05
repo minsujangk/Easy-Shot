@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import doortodoor.easyshot.R;
 import doortodoor.easyshot.database.ImageDatabaseManager;
 import doortodoor.easyshot.under_lollipop.OnCapturedActivity;
 
@@ -44,6 +45,7 @@ public class AssistSession extends VoiceInteractionSession {
     private TextView textView5;
     private TextView textView6;
     private String mURL;
+    private String INTENT_CAPTURE_URL;
 
     public AssistSession(Context context) {
         super(context);
@@ -73,6 +75,9 @@ public class AssistSession extends VoiceInteractionSession {
     @Override
     public void onHandleAssist(Bundle data, AssistStructure structure, AssistContent content) {
         super.onHandleAssist(data, structure, content);
+        INTENT_CAPTURE_URL = getContext().getResources().getString(R.string.INTENT_CAPTURE_URL);
+        Intent broadcast = new Intent(INTENT_CAPTURE_URL);
+        getContext().sendBroadcast(broadcast);
         Uri uri = null;
 //        if ((uri = content.getWebUri()) != null) {
 //            Toast.makeText(mContext, uri.toString(), Toast.LENGTH_LONG).show();

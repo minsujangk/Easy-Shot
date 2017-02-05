@@ -2,6 +2,7 @@
     <string name="app_name">Easy Shot</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="INTENT_SCREENSHOT" translatable="false">doortodoor.easyshot.intent.screenshot</string>
+    <string name="INTENT_CAPTURE_URL" translatable="false">doortodoor.easyshot.intent.capture_url</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

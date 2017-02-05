@@ -128,7 +128,7 @@ public class FolderDatabaseManager {
 
     //SQL 작업을 위한 SQLiteOpenHelper
     public class FolderDatabaseHelper extends SQLiteOpenHelper {
-        public static final int DATABASE_VERSION = 2;
+        public static final int DATABASE_VERSION = 3;
         public static final String DATABASE_NAME = "ImageDatabase.db";
 
         public FolderDatabaseHelper(Context context) {
