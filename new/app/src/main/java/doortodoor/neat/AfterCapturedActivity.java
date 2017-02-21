@@ -56,6 +56,7 @@ public class AfterCapturedActivity extends AppCompatActivity {
         anim.setDuration(300);
         layout_after_captured.startAnimation(anim);
 
+
         // 종료 애니메이션
         final AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         anim.setDuration(300);
