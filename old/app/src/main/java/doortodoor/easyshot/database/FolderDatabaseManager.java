@@ -14,6 +14,13 @@ import java.util.Arrays;
  * Created by noble on 2017-01-14.
  */
 
+
+/*
+* FolderDatabaseManager
+* Folder를 관리하는 SQL DB를 만들어서 실행함.
+* ImageDatabaseManager에서 관리함.
+* */
+
 public class FolderDatabaseManager {
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
@@ -39,11 +46,7 @@ public class FolderDatabaseManager {
     * 데이터베이스에 주어진 값으로 이루어진 Row를 삽입한다.
     *
     * Input
-    *   img_loc : 이미지의 경로
-    *   name    : 상품의 이름
-    *   price   : 상품의 가격
-    *   tag     : 상품의 태그 (비어있을 수 있다.)
-    *   url     : 상품의 URL (null일 수 있다.)
+    *   folder : Folder의 이름
     *
     * Output
     *   boolean type : 성공하면 true, 실패하면
@@ -61,14 +64,15 @@ public class FolderDatabaseManager {
 
 
     /*
+    * search
     * 데이터베이스에서 entry가 value와 일치하는 row를 찾아서 ArrayList<DataItem>으로 반환한다.
     *
     * Input
-    *   entry   : 찾을 DataItem의 타입
+    *   entry   : 찾을 Folder의 타입
     *   value   : 값의 ArrayList
     *
     * Output
-    *   ArrayList<DataItem> : 찾은 DataItem들의 List
+    *   ArrayList<Folder> : 찾은 Folder들의 ArrayList
     *   */
 
     public ArrayList<Folder> search(String entry, ArrayList<String> value) {
@@ -97,6 +101,15 @@ public class FolderDatabaseManager {
         return folder_list;
     }
 
+    /*
+     * getAll()
+     * 데이터베이스의 값을 모두 반환한다.
+     *
+     * Input
+     *
+     * Output
+     *   ArrayList<Folder> : 찾은 모든 Folder들의 ArrayList
+     *   */
     public ArrayList<Folder> getAll() {
         ArrayList<Folder> folder_list = new ArrayList<Folder>();
         Cursor c = mDatabase.rawQuery("select * from " + FolderTableEntry.TABLE_NAME, null);
@@ -111,13 +124,6 @@ public class FolderDatabaseManager {
         }
 
         return folder_list;
-    }
-
-
-    public ArrayList<String> parseTagString(String tagString) {
-        //[,] 제거
-        tagString = tagString.substring(1, tagString.length() - 1);
-        return new ArrayList<String>(Arrays.asList(tagString.split(",")));
     }
 
     //데이터베이스를 만들기 위한 기본적인 Columns

@@ -2,6 +2,7 @@ package doortodoor.easyshot;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,14 +18,22 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import doortodoor.easyshot.database.ImageDatabaseManager;
+
 import static android.content.ContentValues.TAG;
 
+/*
+* MyAccessibilityService extends AccessibilityService
+* 화면에서 URL을 긁어올 때 이용되는 AccessibilityService.
+* */
 public class MyAccessibilityService extends AccessibilityService {
 
     private static String INTENT_CAPTURE_URL;
     private String mURL;
     private AccessibilityNodeInfo source;
     private URLServiceReceiver mReceiver;
+    private ImageDatabaseManager imageDB;
+    private static String INTENT_SAVE_URL;
 
     public MyAccessibilityService() {
     }
@@ -32,10 +41,13 @@ public class MyAccessibilityService extends AccessibilityService {
     @Override
     public void onServiceConnected() {
         INTENT_CAPTURE_URL = getResources().getString(R.string.INTENT_CAPTURE_URL);
+        INTENT_SAVE_URL = getResources().getString(R.string.INTENT_SAVE_URL);
         IntentFilter filter = new IntentFilter();
         filter.addAction(INTENT_CAPTURE_URL);
+        filter.addAction(INTENT_SAVE_URL);
         mReceiver = new URLServiceReceiver();
         registerReceiver(mReceiver, filter);
+        imageDB = new ImageDatabaseManager(this);
     }
 
 
@@ -67,17 +79,20 @@ public class MyAccessibilityService extends AccessibilityService {
         switch (eventType) {
             case AccessibilityEvent.TYPE_WINDOWS_CHANGED:
                 Toast.makeText(getApplicationContext(), "hi", Toast.LENGTH_SHORT).show();
+
+
                 eventText = "Focused: ";
                 break;
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
 //                Toast.makeText(getApplicationContext(), "ww", Toast.LENGTH_SHORT).show();
                 source = event.getSource();
                 captureURL();
-
                 break;
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-                Toast.makeText(getApplicationContext(), "wws", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "wws", Toast.LENGTH_SHORT).show();
                 eventText = "Focused: ";
+                source = event.getSource();
+                captureURL();
                 break;
         }
 
@@ -112,8 +127,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (an.getText() != null)
                     if (isValidURL(an.getText().toString())) {
                         mURL = an.getText().toString();
-                        getSharedPreferences("url", MODE_PRIVATE).edit().putString("accessibility_url", mURL);
-                        Toast.makeText(getApplicationContext(), mURL + an.getClassName() + an.getContentDescription(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "url = " + mURL, Toast.LENGTH_SHORT).show();
                         break;
                     }
                 for (int i = 0; i < an.getChildCount(); i++) {
@@ -121,6 +135,11 @@ public class MyAccessibilityService extends AccessibilityService {
                 }
             }
         }
+    }
+
+    public void saveURL(int id){
+        imageDB.updateURLColumn(Integer.toString(id), mURL);
+        Toast.makeText(getApplicationContext(), "url = " + mURL, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -138,7 +157,13 @@ public class MyAccessibilityService extends AccessibilityService {
             String action = intent.getAction();
             if (action.equals(INTENT_CAPTURE_URL)) {
                 //스크린샷 액션 발생
+                Log.e("wow", "broadcast received");
                 captureURL();
+            } else if (action.equals(INTENT_SAVE_URL)) {
+                //스크린샷 액션 발생
+                Log.e("wow", "broadcast save received");
+                int id = intent.getIntExtra("id", -1);
+                saveURL(id);
             }
 
         }

@@ -3,6 +3,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="INTENT_SCREENSHOT" translatable="false">doortodoor.easyshot.intent.screenshot</string>
     <string name="INTENT_CAPTURE_URL" translatable="false">doortodoor.easyshot.intent.capture_url</string>
+    <string name="INTENT_SAVE_URL" translatable="false">doortodoor.easyshot.intent.save_url</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

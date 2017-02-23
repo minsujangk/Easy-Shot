@@ -6,6 +6,18 @@ import java.util.ArrayList;
  * Created by noble on 2017-01-14.
  */
 
+
+/*
+* DataItem
+* URL 데이터를 담아두는 객체
+* ImageDatabaseManager에서 SQL과 함께 관리된다.
+* id : item의 id (PRIMARY로 정해짐)
+* location : item의 스크린샷의 sdcard 내의 저장소
+* columnName : item의 이름 (현재는 시간 데이터로 만듦)
+* columnFolder : item이 속한 folder의 index (Folder DB는 Folder 객체와 FolderDatabaseManager에 의해 관리)
+* columnTag : 태그, ArrayList<String>의 array 표현 방식으로 들어감. 미구현
+* columnUrl : item의 url
+* */
 public class DataItem {
     public long id;
     public String location;

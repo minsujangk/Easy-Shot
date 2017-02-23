@@ -33,6 +33,10 @@ import java.util.Date;
 
 import doortodoor.easyshot.R;
 
+/*
+* ScreenshotService extends Service
+* 5.0+의 기기에서 MediaProjection을 이용한 캡쳐.
+* */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class ScreenshotService extends Service {
     private static final String TAG = ScreenshotService.class.getSimpleName();

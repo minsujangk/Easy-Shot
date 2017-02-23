@@ -41,6 +41,7 @@ public class OnCapturedActivity extends AppCompatActivity implements View.OnTouc
     private String mItemName;
     private String mItemLocation;
     private String mItemURL;
+    private String INTENT_SAVE_URL;
 
     private static float convertDpToPixel(float dp, Context context) {
         Resources resources = context.getResources();
@@ -60,11 +61,6 @@ public class OnCapturedActivity extends AppCompatActivity implements View.OnTouc
         mItemName = intent.getStringExtra("name");
         mItemLocation = intent.getStringExtra("img_loc");
         mItemURL = intent.getStringExtra("url");
-
-
-        mItemURL = getSharedPreferences("url", MODE_PRIVATE).getString("accessibility_url", "");
-        Toast.makeText(this, mItemURL, Toast.LENGTH_SHORT).show();
-
 
         mImageDatabaseManager = new ImageDatabaseManager(this);
 
@@ -177,9 +173,15 @@ public class OnCapturedActivity extends AppCompatActivity implements View.OnTouc
     }
 
     private void saveData() {
-        if (mImageDatabaseManager.insert(mItemName, editText.getText().toString(), mItemLocation, new ArrayList<String>(), mItemURL)) {
+        int id = mImageDatabaseManager.insert(mItemName, editText.getText().toString(), mItemLocation, new ArrayList<String>(), mItemURL);
+        if (id != -1) {
             Log.e("OnCapturedActivity", "Item inserted to " + mItemName + " " + editText.getText().toString() + " " + mItemLocation + " " + mItemURL);
         }
+        INTENT_SAVE_URL = getResources().getString(R.string.INTENT_SAVE_URL);
+        Intent broadcast = new Intent();
+        broadcast.putExtra("id", id);
+        broadcast.setAction(INTENT_SAVE_URL);
+        sendBroadcast(broadcast);
     }
 
     public void setWindowParams() {

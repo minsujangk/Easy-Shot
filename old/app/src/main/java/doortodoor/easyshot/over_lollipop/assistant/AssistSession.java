@@ -31,7 +31,10 @@ import doortodoor.easyshot.under_lollipop.OnCapturedActivity;
  * Created by noble on 2017-01-05.
  */
 
-
+/*
+* AssistService
+* 6.0+의 기기에서 Assistant API 서비스를 실행하고 캡쳐함.
+* */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class AssistSession extends VoiceInteractionSession {
 
@@ -54,23 +57,11 @@ public class AssistSession extends VoiceInteractionSession {
     }
 
 
-//    @Override
-//    public View onCreateContentView() {
-//        View mContentView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-//                .inflate(R.layout.view_success_notification, null);
-//
-//
-////        mContentView.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-//
-//        textView = (TextView) mContentView.findViewById(R.id.textView);
-//        textView2 = (TextView) mContentView.findViewById(R.id.textView2);
-//        textView3 = (TextView) mContentView.findViewById(R.id.textView3);
-//        textView4 = (TextView) mContentView.findViewById(R.id.textView4);
-//        textView5 = (TextView) mContentView.findViewById(R.id.textView5);
-//        textView6 = (TextView) mContentView.findViewById(R.id.textView6);
-//        return null;
-//    }
-
+    /*
+    *  void onHandleAssist(Bundle data, AssistStructure structure, AssistContent content)
+    * Assistant Service를 실행하면 먼저 튀어나옴
+    * Accessibility Service에게 화면에서 URL을 따오도록 명령.
+    *   */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onHandleAssist(Bundle data, AssistStructure structure, AssistContent content) {
@@ -78,7 +69,6 @@ public class AssistSession extends VoiceInteractionSession {
         INTENT_CAPTURE_URL = getContext().getResources().getString(R.string.INTENT_CAPTURE_URL);
         Intent broadcast = new Intent(INTENT_CAPTURE_URL);
         getContext().sendBroadcast(broadcast);
-        Uri uri = null;
 //        if ((uri = content.getWebUri()) != null) {
 //            Toast.makeText(mContext, uri.toString(), Toast.LENGTH_LONG).show();
 //            textView.setText(uri.toString());
@@ -125,6 +115,11 @@ public class AssistSession extends VoiceInteractionSession {
 
     }
 
+    /*
+     * void onHandleScreenshot(Bitmap screenshot)
+     * Assistant Service를 실행하면 먼저 튀어나옴
+     * Accessibility Service에게 화면에서 URL을 따오도록 명령.
+     *   */
     @Override
     public void onHandleScreenshot(Bitmap screenshot) {
         String name = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -142,6 +137,10 @@ public class AssistSession extends VoiceInteractionSession {
         mContext.startActivity(intent);
     }
 
+    /*
+     * String resolveScreenshot(Bitmap captured)
+     * 캡쳐된 Bitmap인 captured를 가져와서 /easyshot/myscreen_시간.png로 저장한다.
+     *   */
     private String resolveScreenshot(Bitmap captured) {
         String IMAGES_PRODUCED = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String exStorage = Environment.getExternalStorageDirectory().toString();

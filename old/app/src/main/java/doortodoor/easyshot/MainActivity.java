@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,33 +79,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageDatabaseManager mManager = new ImageDatabaseManager(this);
-        ArrayList<DataItem> items = mManager.getAll();
+        ListView listView = (ListView)findViewById(R.id.list_view);
+        listView.setAdapter(new ImageDataAdapter(this));
 
-        for (DataItem item : items) {
-            LinearLayout linear = new LinearLayout(this);
-            linear.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-            linear.setOrientation(LinearLayout.VERTICAL);
-            File imgFile = new File(item.getLocation());
-            ImageView imageView = new ImageView(this);
-            if (imgFile.exists()) {
-                Bitmap myBitmap = null;
-                if (imgFile != null) {
-                    myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                }
-                imageView.setImageBitmap(myBitmap);
-            }
-            TextView t = new TextView(this);
-            t.setText(Integer.toString(item.getColumnFolder()) + " " + item.getColumnUrl());
-
-            linear.addView(imageView);
-            linear.addView(t);
-
-            layout.addView(linear);
-
-
-        }
 
 
 //        try{

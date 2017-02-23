@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -19,7 +20,7 @@ public class ImageDatabaseManager {
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
-    private static final String SQL_CREATE_ENTRIES =
+    private static final String SQL_IMAGE_CREATE_ENTRIES =
             "CREATE TABLE " + ImageTableEntry.TABLE_NAME + " (" +
                     ImageTableEntry._ID + " INTEGER PRIMARY KEY," +
                     ImageTableEntry.COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
@@ -30,8 +31,8 @@ public class ImageDatabaseManager {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ImageTableEntry.TABLE_NAME;
     public static Context mContext;
-    private final SQLiteDatabase mDatabase;
-    private final ImageDatabaseHelper mHelper;
+    private SQLiteDatabase mDatabase;
+    private ImageDatabaseHelper mHelper;
     private final FolderDatabaseManager mFolder;
     private ArrayList<Folder> mFolder_list;
 
@@ -57,7 +58,7 @@ public class ImageDatabaseManager {
     * Output
     *   boolean type : 성공하면 true, 실패하면
     *   */
-    public boolean insert(String name, String folder_name, String img_loc, ArrayList<String> tag, String url) {
+    public int insert(String name, String folder_name, String img_loc, ArrayList<String> tag, String url) {
         long folder_id = -1;
         for (Folder folder : mFolder_list) {
             if (folder.getFolderName().equals(folder_name)) {
@@ -80,7 +81,7 @@ public class ImageDatabaseManager {
         long newRowId = mDatabase.insert(ImageTableEntry.TABLE_NAME, null, values);
 
         //insert가 실패하면
-        return newRowId != -1;
+        return (int) newRowId;
     }
 
 
@@ -156,6 +157,21 @@ public class ImageDatabaseManager {
         return list;
     }
 
+    public void updateURLColumn(String rowId, String newValue) {
+        String sql = "UPDATE "+ImageTableEntry.TABLE_NAME +" SET " + ImageTableEntry.COLUMN_URL+ " = '"+newValue+"' WHERE "+ImageTableEntry._ID+ " = "+rowId;
+        mDatabase.beginTransaction();
+        SQLiteStatement stmt = mDatabase.compileStatement(sql);
+        try{
+            stmt.execute();
+            mDatabase.setTransactionSuccessful();
+        }finally{
+            mDatabase.endTransaction();
+        }
+//        ContentValues cv = new ContentValues();
+//        cv.put(ImageTableEntry.COLUMN_URL, newValue);
+//        mDatabase.update(ImageTableEntry.TABLE_NAME, cv, ImageTableEntry._ID + "= ?", new String[]{rowId});
+
+    }
 
     public ArrayList<String> parseTagString(String tagString) {
         //[,] 제거
@@ -165,7 +181,7 @@ public class ImageDatabaseManager {
 
     //데이터베이스를 만들기 위한 기본적인 Columns
     public static class ImageTableEntry implements BaseColumns {
-        public static final String TABLE_NAME = "image_db";
+        public static final String TABLE_NAME = "image__db";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_FOLDER_ID = "folder_id";
         public static final String COLUMN_IMAGE_LOCATION = "image_location";
@@ -175,8 +191,8 @@ public class ImageDatabaseManager {
 
     //SQL 작업을 위한 SQLiteOpenHelper
     public class ImageDatabaseHelper extends SQLiteOpenHelper {
-        public static final int DATABASE_VERSION = 3;
-        public static final String DATABASE_NAME = "ImageDatabase.db";
+        public static final int DATABASE_VERSION = 6;
+        public static final String DATABASE_NAME = "Database.db";
 
         public ImageDatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -186,8 +202,9 @@ public class ImageDatabaseManager {
         @Override
         public void onCreate(SQLiteDatabase db) {
             Log.e("this", "database image added");
-            db.execSQL(SQL_CREATE_ENTRIES);
+            db.execSQL(SQL_IMAGE_CREATE_ENTRIES);
         }
+
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
